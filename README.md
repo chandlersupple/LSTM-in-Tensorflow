@@ -1,2 +1,1 @@
-# LSTM-in-Tensorflow
-The following is an LSTM coded in Tensorflow which trains on the PTB dataset.
+The network is somewhat barebones, but I do plan on publishing a few more models which can achieve greater accuracy in later repositories. I've made notes in the code explaining the more significant parts of the network, so definitely check out the model if you're just learning Tensorflow!
