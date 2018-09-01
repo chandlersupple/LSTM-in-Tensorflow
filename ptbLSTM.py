@@ -24,7 +24,7 @@ text, vocab_size, chars, char_dict = numerize(ptbtext) # Applies the 'numerize' 
 
 class ptbLSTM():
     
-    def __init__(self, text, vocab_size, batch_size, time_steps, hidden_units, num_layers, mode):
+    def __init__(self, text, vocab_size, batch_size, time_steps, hidden_units, num_layers):
         # Parameters
         hidden_units = hidden_units 
         num_layers = num_layers
@@ -32,7 +32,6 @@ class ptbLSTM():
         self.time_steps = time_steps
         self.text = text
         self.vocab_size = vocab_size
-        self.mode = mode
         
         # Containers for the input and target data
         self.x = tf.placeholder(tf.int32, [self.batch_size, self.time_steps])
@@ -105,8 +104,8 @@ def sample(sess, words, time_steps, seed, chars, char_dict):
         _text.append(chars[pred_am[-1]])
     return _text
         
-ptblstm = ptbLSTM(text, vocab_size, 16, 32, 256, 2, 1) # Creates an instance of our 'ptbLSTM' class
-sample_rnn = ptbLSTM(text, vocab_size, 1, 32, 256, 2, 1)
+ptblstm = ptbLSTM(text, vocab_size, 16, 32, 256, 2) # Creates an instance of our 'ptbLSTM' class
+sample_rnn = ptbLSTM(text, vocab_size, 1, 32, 256, 2)
 
 batches_in_epoch = len(text) // (ptblstm.batch_size * ptblstm.time_steps + 1)
 sess.run(tf.global_variables_initializer()) # Initializes variables
