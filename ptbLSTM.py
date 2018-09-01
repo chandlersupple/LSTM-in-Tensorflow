@@ -3,8 +3,8 @@
 import tensorflow as tf
 sess = tf.InteractiveSession()
 
-with open('ptb.train.txt') as sptextfile: # We'll train our LSTM network on all Shakespeare's published plays
-    sptext = sptextfile.readlines()
+with open('ptb.train.txt') as ptbtextfile: # We'll train our LSTM network on the PTB dataset
+    ptbtext = ptbtextfile.readlines()
     
 def numerize(text): # Represents words with values, where each unique word is assigned a unique value
     chars = []
@@ -20,9 +20,9 @@ def numerize(text): # Represents words with values, where each unique word is as
             new_text.append(char_dict.get(text[line][char]))
     return new_text, len(chars), chars, char_dict
         
-text, vocab_size, chars, char_dict = numerize(sptext) # Applies the 'numerize' function to our data
+text, vocab_size, chars, char_dict = numerize(ptbtext) # Applies the 'numerize' function to our data
 
-class spLSTM():
+class ptbLSTM():
     
     def __init__(self, text, vocab_size, batch_size, time_steps, hidden_units, num_layers, mode):
         # Parameters
@@ -72,7 +72,7 @@ class spLSTM():
             self.train_op = optimizer.apply_gradients(zip(grads, tvars))
         
     def accuracy(self, lx, ly): # Calculates the accuracy of the model
-        soft_out = tf.nn.softmax(tf.reshape(sess.run(splstm.logits, {splstm.x: lx, splstm.y: ly}), [-1, splstm.vocab_size]))
+        soft_out = tf.nn.softmax(tf.reshape(sess.run(ptblstm.logits, {ptblstm.x: lx, ptblstm.y: ly}), [-1, ptblstm.vocab_size]))
         so_pred = tf.cast(tf.argmax(soft_out, 1), tf.int32)
         correct = tf.equal(so_pred, tf.reshape(ly, [-1]))
         return sess.run(tf.reduce_mean(tf.cast(correct, tf.float32)))
@@ -105,20 +105,20 @@ def sample(sess, words, time_steps, seed, chars, char_dict):
         _text.append(chars[pred_am[-1]])
     return _text
         
-splstm = spLSTM(text, vocab_size, 16, 32, 256, 2, 1) # Creates an instance of our 'spLSTM' class
-sample_rnn = spLSTM(text, vocab_size, 1, 32, 256, 2, 1)
+ptblstm = ptbLSTM(text, vocab_size, 16, 32, 256, 2, 1) # Creates an instance of our 'ptbLSTM' class
+sample_rnn = ptbLSTM(text, vocab_size, 1, 32, 256, 2, 1)
 
-batches_in_epoch = len(text) // (splstm.batch_size * splstm.time_steps + 1)
+batches_in_epoch = len(text) // (ptblstm.batch_size * ptblstm.time_steps + 1)
 sess.run(tf.global_variables_initializer()) # Initializes variables
 
 # Training
 for epoch_iter in range (32):
     for batch_iter in range (batches_in_epoch):
-        lx, ly = splstm.build_batch(batch_iter, batches_in_epoch)
-        splstm.train(sess, {splstm.x: lx, splstm.y: ly})
+        lx, ly = ptblstm.build_batch(batch_iter, batches_in_epoch)
+        ptblstm.train(sess, {ptblstm.x: lx, ptblstm.y: ly})
         if batch_iter % 200 == 0:
-            cost = sess.run(splstm.cost, {splstm.x: lx, splstm.y: ly})
-            acc = splstm.accuracy(lx, ly)
+            cost = sess.run(ptblstm.cost, {ptblstm.x: lx, ptblstm.y: ly})
+            acc = ptblstm.accuracy(lx, ly)
             print('Cost: %s, Accuracy: %s, %s / %s Batches, Epoch %s' %(cost, acc, batch_iter, batches_in_epoch, epoch_iter))
             p_bar = []
             for p_batch in range (1, batches_in_epoch, (batches_in_epoch // 100)):
